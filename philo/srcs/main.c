@@ -6,7 +6,7 @@
 /*   By: rlarabi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/20 16:34:39 by rlarabi           #+#    #+#             */
-/*   Updated: 2023/02/26 15:51:47 by rlarabi          ###   ########.fr       */
+/*   Updated: 2023/02/27 00:43:14 by rlarabi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,10 +82,10 @@ void	display(t_env *env)
 	env->num_eat, env->num_philo, env->time_d, env->time_e, env->time_s);
 	while(i < env->num_philo)
 	{
+		printf("\n-------------------\n");
 		printf("env->philos[%d].pos %d\nenv->philos[%d].r_fork %d\nenv->philos[%d].l_fork %d\nenv->philos[%d].time_eat %d\n", \
 		i,env->philos[i].pos, i,env->philos[i].r_fork, i,env->philos[i].l_fork, i,env->philos[i].time_eat);
 		i++;
-		printf("\n-------------------\n");
 	}
 }
 
@@ -112,21 +112,59 @@ unsigned long get_time(void)
 	time = (t.tv_sec * 1000) + (t.tv_usec / 1000);
 	return time;
 }
+void	philo_eat(t_philos *philos)
+{
+	pthread_mutex_lock(&philos->env->forks[philos->r_fork]);
+	printf("%d %d has taken a fork\n", get_time() - philos->env->start_time, philos->pos);
+	pthread_mutex_lock(&philos->env->forks[philos->l_fork]);
+	printf("%d %d has taken a fork\n", get_time() - philos->env->start_time, philos->pos);
+	printf("%d %d is eating\n", get_time() - philos->env->start_time, philos->pos);
+	philos->last_eat = get_time();
+	usleep(philos->env->time_e * 1000);
+	philos->time_eat++;
+	pthread_mutex_unlock(&philos->env->forks[philos->l_fork]);
+	pthread_mutex_unlock(&philos->env->forks[philos->r_fork]);
+}
+
 void *routine(void *a)
 {
+	t_philos *philos;
 	t_env *env;
 
-	env = (t_env *)a;
+	philos = (t_philos *)a;
+	env = philos->env;
+	if (philos->pos % 2 == 0)
+		usleep(env->time_s * 1000);
+	// printf("------> this is philo %d in the time %lu\n", philos->pos, get_time() - env->start_time);
+	while (1)
+	{
+		philo_eat(philos);
+		printf("%d %d is sleeping\n", get_time() - env->start_time, philos->pos);
+		usleep(env->time_s * 1000);
+		printf("%d %d is thinking\n", get_time() - env->start_time, philos->pos);
+		if (philos->time_eat == env->num_eat && env->num_eat != -404)
+			break;
+	}
+	return NULL;
 	
 }
 int	init_pthread(t_env *env)
 {
 	int i = 0;
-	env->start_time = get_time;
+	env->start_time = get_time();
 	while (i < env->num_philo)
 	{
-		pthread_create(env->philos[i].thread_id, NULL, routine, (void *)env);
+		// sleep(1);
+		pthread_create(&env->philos[i].thread_id, NULL, routine, &(env->philos[i]));
+		i++;
+	}
+	i = 0;
+	while (i < env->num_philo)
+	{
+		pthread_join(env->philos[i].thread_id, NULL);
+		i++;
 	}	
+	return 1;
 }
 
 int main(int ac, char **av)
@@ -144,6 +182,6 @@ int main(int ac, char **av)
 		return 0;
 	if(!init_pthread(env))
 		return 0;
-	display(env);
+	// display(env);
     return 0;
 }

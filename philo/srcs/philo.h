@@ -6,7 +6,7 @@
 /*   By: rlarabi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/20 16:42:02 by rlarabi           #+#    #+#             */
-/*   Updated: 2023/02/26 15:35:43 by rlarabi          ###   ########.fr       */
+/*   Updated: 2023/02/26 20:27:02 by rlarabi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ typedef struct s_philos
     int l_fork;
     int last_eat;
     int time_eat;
-    pthread_t *thread_id;
+    pthread_t thread_id;
     struct s_env  *env;
 } t_philos;
 

@@ -11,7 +11,7 @@ CC = cc
 all: $(NAME)
 
 $(NAME): $(O_SRCS)
-	$(CC) $(CFLAGS) $(SRCS) -o $(NAME)
+	$(CC) $(CFLAGS) $(SRCS) -pthread -o $(NAME)
 
 clean:
 	$(RM) $(O_SRCS)
