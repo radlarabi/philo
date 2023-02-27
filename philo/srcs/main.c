@@ -6,7 +6,7 @@
 /*   By: rlarabi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/20 16:34:39 by rlarabi           #+#    #+#             */
-/*   Updated: 2023/02/27 00:43:14 by rlarabi          ###   ########.fr       */
+/*   Updated: 2023/02/27 20:55:13 by rlarabi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,6 +101,16 @@ int init_mutex(t_env *env)
 			return 0;
 		i++;
 	}
+	i = 0;
+	env->eat = malloc(sizeof(pthread_mutex_t) * env->num_philo);
+	if (!env->eat)
+		return 0;
+	while(i < env->num_philo)
+	{
+		if(pthread_mutex_init(env->eat, NULL))
+			return 0;
+		i++;
+	}
 	return 1;
 }
 
@@ -118,8 +128,10 @@ void	philo_eat(t_philos *philos)
 	printf("%d %d has taken a fork\n", get_time() - philos->env->start_time, philos->pos);
 	pthread_mutex_lock(&philos->env->forks[philos->l_fork]);
 	printf("%d %d has taken a fork\n", get_time() - philos->env->start_time, philos->pos);
+	pthread_mutex_lock(&philos->env->eat[philos->pos - 1]);
 	printf("%d %d is eating\n", get_time() - philos->env->start_time, philos->pos);
 	philos->last_eat = get_time();
+	pthread_mutex_unlock(&philos->env->eat[philos->pos - 1]);
 	usleep(philos->env->time_e * 1000);
 	philos->time_eat++;
 	pthread_mutex_unlock(&philos->env->forks[philos->l_fork]);
@@ -135,7 +147,6 @@ void *routine(void *a)
 	env = philos->env;
 	if (philos->pos % 2 == 0)
 		usleep(env->time_s * 1000);
-	// printf("------> this is philo %d in the time %lu\n", philos->pos, get_time() - env->start_time);
 	while (1)
 	{
 		philo_eat(philos);
@@ -154,7 +165,6 @@ int	init_pthread(t_env *env)
 	env->start_time = get_time();
 	while (i < env->num_philo)
 	{
-		// sleep(1);
 		pthread_create(&env->philos[i].thread_id, NULL, routine, &(env->philos[i]));
 		i++;
 	}

@@ -6,7 +6,7 @@
 /*   By: rlarabi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/20 16:42:02 by rlarabi           #+#    #+#             */
-/*   Updated: 2023/02/26 20:27:02 by rlarabi          ###   ########.fr       */
+/*   Updated: 2023/02/27 14:58:17 by rlarabi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ typedef struct s_env
     unsigned long start_time;
     t_philos    *philos;
     pthread_mutex_t *forks;
+    pthread_mutex_t *eat;
 } t_env;
 
 #endif
