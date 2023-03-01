@@ -6,7 +6,7 @@
 /*   By: rlarabi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/20 16:34:39 by rlarabi           #+#    #+#             */
-/*   Updated: 2023/02/27 20:55:13 by rlarabi          ###   ########.fr       */
+/*   Updated: 2023/03/01 00:20:18 by rlarabi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,6 +69,7 @@ t_philos	*init_philos(t_env *env)
 		philos[i].r_fork = (i + 1) % env->num_philo;
 		philos[i].env = env;
 		philos[i].time_eat = 0;
+		philos[i].last_eat = 0;
 		i++;		
 	}
 	return philos;
@@ -116,11 +117,10 @@ int init_mutex(t_env *env)
 
 unsigned long get_time(void)
 {
-	unsigned long time;
 	struct timeval t;
+
 	gettimeofday(&t, NULL);
-	time = (t.tv_sec * 1000) + (t.tv_usec / 1000);
-	return time;
+	return ((t.tv_sec * 1000) + (t.tv_usec / 1000));
 }
 void	philo_eat(t_philos *philos)
 {
@@ -131,9 +131,9 @@ void	philo_eat(t_philos *philos)
 	pthread_mutex_lock(&philos->env->eat[philos->pos - 1]);
 	printf("%d %d is eating\n", get_time() - philos->env->start_time, philos->pos);
 	philos->last_eat = get_time();
+	philos->time_eat++;
 	pthread_mutex_unlock(&philos->env->eat[philos->pos - 1]);
 	usleep(philos->env->time_e * 1000);
-	philos->time_eat++;
 	pthread_mutex_unlock(&philos->env->forks[philos->l_fork]);
 	pthread_mutex_unlock(&philos->env->forks[philos->r_fork]);
 }
@@ -146,15 +146,13 @@ void *routine(void *a)
 	philos = (t_philos *)a;
 	env = philos->env;
 	if (philos->pos % 2 == 0)
-		usleep(env->time_s * 1000);
+		usleep(200);
 	while (1)
 	{
 		philo_eat(philos);
 		printf("%d %d is sleeping\n", get_time() - env->start_time, philos->pos);
 		usleep(env->time_s * 1000);
 		printf("%d %d is thinking\n", get_time() - env->start_time, philos->pos);
-		if (philos->time_eat == env->num_eat && env->num_eat != -404)
-			break;
 	}
 	return NULL;
 	
@@ -162,11 +160,33 @@ void *routine(void *a)
 int	init_pthread(t_env *env)
 {
 	int i = 0;
+	int j = 0;
 	env->start_time = get_time();
 	while (i < env->num_philo)
 	{
 		pthread_create(&env->philos[i].thread_id, NULL, routine, &(env->philos[i]));
 		i++;
+	}
+	while(1)
+	{
+		i = 0;
+		j = 0;
+		while(i < env->num_philo)
+		{
+			
+			if ((int)get_time() - env->philos[i].last_eat >= env->time_d)
+			{
+				printf("%d %d died\n", get_time() - env->start_time, env->philos[i].pos);
+				return 0;	
+			}
+			j += env->philos[i].time_eat;
+			if (j >= env->num_eat * env->num_philo)
+			{
+				printf("philosofers has eat %d\n", env->num_eat);
+				return 0;
+			}
+		i++;
+		}
 	}
 	i = 0;
 	while (i < env->num_philo)
@@ -192,6 +212,5 @@ int main(int ac, char **av)
 		return 0;
 	if(!init_pthread(env))
 		return 0;
-	// display(env);
     return 0;
 }
