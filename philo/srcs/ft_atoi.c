@@ -6,11 +6,11 @@
 /*   By: rlarabi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/10/06 17:08:33 by rlarabi           #+#    #+#             */
-/*   Updated: 2022/10/29 11:12:10 by rlarabi          ###   ########.fr       */
+/*   Updated: 2023/03/04 22:30:03 by rlarabi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "../includes/philo.h"
 
 static int	skip_blank(const char *str)
 {

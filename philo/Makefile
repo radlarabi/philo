@@ -1,7 +1,10 @@
 SRCS = 	srcs/main.c \
-		includes/libft/ft_atoi.c \
+		srcs/checks.c \
+		srcs/init.c \
+		srcs/philo_utiles.c \
+		srcs/ft_atoi.c \
 
-# CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror
 NAME = philo
 O_SRCS = $(SRCS:%.c=%.o)
 
@@ -11,7 +14,7 @@ CC = cc
 all: $(NAME)
 
 $(NAME): $(O_SRCS)
-	$(CC) $(CFLAGS) $(SRCS) -pthread -o $(NAME)
+	$(CC) $(CFLAGS) $(SRCS) -o $(NAME)
 
 clean:
 	$(RM) $(O_SRCS)
@@ -25,3 +28,7 @@ norm:
 	@norminette
 
 .PHONY: all clean fclean re norm
+
+
+
+# $(CC) $(CFLAGS) $(SRCS) -o $(NAME) -fsanitize=thread -g3
