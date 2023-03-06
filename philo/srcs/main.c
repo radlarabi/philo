@@ -6,7 +6,7 @@
 /*   By: rlarabi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/20 16:34:39 by rlarabi           #+#    #+#             */
-/*   Updated: 2023/03/04 22:24:31 by rlarabi          ###   ########.fr       */
+/*   Updated: 2023/03/05 13:08:07 by rlarabi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,6 @@ int	destroy(t_env *env)
 		pthread_mutex_destroy(&env->eat[i]);
 		i++;
 	}
-	pthread_mutex_destroy(env->died);
 	pthread_mutex_destroy(env->writing);
 	return (1);
 }

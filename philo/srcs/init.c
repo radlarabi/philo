@@ -6,21 +6,39 @@
 /*   By: rlarabi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/04 22:08:22 by rlarabi           #+#    #+#             */
-/*   Updated: 2023/03/04 22:26:59 by rlarabi          ###   ########.fr       */
+/*   Updated: 2023/03/06 22:24:32 by rlarabi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/philo.h"
+
+int		check_philos(t_env *env, int i, int *j)
+{
+	if (env->philos[i].last_eat != 0
+		&& get_time() - env->philos[i].last_eat >= (unsigned long)env->time_d)
+	{
+		// pthread_mutex_lock(env->died);
+		printf("%lu %d \033[0;31m died \033[;m\n",
+			get_time() - env->start_time,
+			env->philos[i].pos);
+		return (0);
+	}
+	if (env->philos[i].time_eat == env->num_eat)
+		*j += env->philos[i].time_eat;
+	if (*j > (env->num_eat * env->num_philo) && env->num_eat != -404)
+		return (0);
+	return 1;
+}
 
 int	init_pthread(t_env *env)
 {
 	int	i;
 	int	j;
 
-	i = -1;
 	env->start_time = get_time();
+	i = -1;
 	while (++i < env->num_philo)
-		pthread_create(&env->philos[i].thread_id, NULL, 
+		pthread_create(&env->philos[i].thread_id, NULL,
 			routine, &(env->philos[i]));
 	while (1)
 	{
@@ -28,14 +46,10 @@ int	init_pthread(t_env *env)
 		j = 0;
 		while (++i < env->num_philo)
 		{
-			pthread_mutex_lock(env->writing);
-			if (!deth_philo(env, i))
-				return (0);
-			if (env->philos[i].time_eat == env->num_eat)
-				j += env->philos[i].time_eat;
-			if (!eat_all(env, j))
-				return (0);
-			pthread_mutex_unlock(env->writing);
+			pthread_mutex_lock(&env->eat[env->philos->pos - 1]);
+			if (!check_philos(env, i, &j))
+				return 0;
+			pthread_mutex_unlock(&env->eat[env->philos->pos - 1]);
 		}
 	}
 	destroy(env);
