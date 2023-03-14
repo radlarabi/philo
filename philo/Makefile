@@ -4,7 +4,8 @@ SRCS = 	srcs/main.c \
 		srcs/philo_utiles.c \
 		srcs/ft_atoi.c \
 
-CFLAGS = -Wall -Wextra -Werror
+# CFLAGS = -Wall -Wextra -Werror
+# CFLAGS  = -fsanitize=thread -g3
 NAME = philo
 O_SRCS = $(SRCS:%.c=%.o)
 
@@ -14,7 +15,7 @@ CC = cc
 all: $(NAME)
 
 $(NAME): $(O_SRCS)
-	$(CC) $(CFLAGS) $(SRCS) -o $(NAME)
+	$(CC) $(CFLAGS) $(SRCS) -pthread -o $(NAME)
 
 clean:
 	$(RM) $(O_SRCS)

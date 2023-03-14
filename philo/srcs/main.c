@@ -6,7 +6,7 @@
 /*   By: rlarabi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/20 16:34:39 by rlarabi           #+#    #+#             */
-/*   Updated: 2023/03/05 13:08:07 by rlarabi          ###   ########.fr       */
+/*   Updated: 2023/03/14 20:53:51 by rlarabi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,33 +20,6 @@ unsigned long	get_time(void)
 	return ((t.tv_sec * 1000) + (t.tv_usec / 1000));
 }
 
-int	destroy(t_env *env)
-{
-	int	i;
-
-	i = 0;
-	while (i < env->num_philo)
-	{
-		pthread_join(env->philos[i].thread_id, NULL);
-		i++;
-	}
-	i = 0;
-	while (i < env->num_philo)
-	{
-		pthread_detach(env->philos[i].thread_id);
-		i++;
-	}
-	i = 0;
-	while (i < env->num_philo)
-	{
-		pthread_mutex_destroy(&env->forks[i]);
-		pthread_mutex_destroy(&env->eat[i]);
-		i++;
-	}
-	pthread_mutex_destroy(env->writing);
-	return (1);
-}
-
 int	main(int ac, char **av)
 {
 	t_env	*env;
@@ -54,7 +27,7 @@ int	main(int ac, char **av)
 	if (!check_args(ac))
 		return (0);
 	env = init_env(ac, av);
-	if (!check_env(env))
+	if (!check_env(env, ac, av))
 		return (0);
 	if (!init_mutex(env))
 		return (0);
