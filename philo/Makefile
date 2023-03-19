@@ -6,7 +6,8 @@ SRCS = 	srcs/main.c \
 
 # CFLAGS = -Wall -Wextra -Werror
 # CFLAGS  = -fsanitize=thread -g3
-CFLAGS = -pthread 
+# CFLAGS = -pthread
+
 NAME = philo
 O_SRCS = $(SRCS:%.c=%.o)
 
@@ -16,7 +17,7 @@ CC = cc
 all: $(NAME)
 
 $(NAME): $(O_SRCS)
-	$(CC) $(CFLAGS) $(SRCS) -pthread -o $(NAME)
+	$(CC) $(CFLAGS) $(SRCS) -o $(NAME)
 
 clean:
 	$(RM) $(O_SRCS)
