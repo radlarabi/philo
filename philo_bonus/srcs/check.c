@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   checks.c                                           :+:      :+:    :+:   */
+/*   check.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: rlarabi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/03/04 22:13:09 by rlarabi           #+#    #+#             */
-/*   Updated: 2023/03/19 23:53:10 by rlarabi          ###   ########.fr       */
+/*   Created: 2023/03/21 20:39:30 by rlarabi           #+#    #+#             */
+/*   Updated: 2023/03/21 22:33:14 by rlarabi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,24 +54,10 @@ int	check_args(int ac)
 	return (1);
 }
 
-int	check_philos(t_env *env)
-{
-	int	i;
-
-	i = 0;
-	while (i < env->num_philo)
-	{
-		if (env->philos[i].time_eat < env->num_eat)
-			return (0);
-		i++;
-	}
-	return (1);
-}
-
 void	print_philo(char *str, t_philos *philos)
 {
-	pthread_mutex_lock(&philos->env->writing[philos->pos - 1]);
+	sem_wait(&philos->env->writing[philos->pos - 1]);
 	printf("%lu %d %s\n", get_time() - philos->env->start_time, philos->pos,
 		str);
-	pthread_mutex_unlock(&philos->env->writing[philos->pos - 1]);
+	sem_post(&philos->env->writing[philos->pos - 1]);
 }
