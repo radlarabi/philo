@@ -6,7 +6,7 @@
 /*   By: rlarabi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/04 22:08:22 by rlarabi           #+#    #+#             */
-/*   Updated: 2023/03/19 22:56:29 by rlarabi          ###   ########.fr       */
+/*   Updated: 2023/04/06 13:28:48 by rlarabi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,10 +22,10 @@ void	*routine(void *a)
 	while (1)
 	{
 		pthread_mutex_lock(&philos->env->forks[philos->r_fork]);
-		print_philo("has taken a fork", philos);
+		print_philo("has taken a fork", philos, 0);
 		pthread_mutex_lock(&philos->env->forks[philos->l_fork]);
-		print_philo("has taken a fork", philos);
-		print_philo("is eating", philos);
+		print_philo("has taken a fork", philos, 0);
+		print_philo("is eating", philos, 0);
 		pthread_mutex_lock(&philos->env->count);
 		philos->time_eat++;
 		philos->last_eat = get_time();
@@ -33,9 +33,9 @@ void	*routine(void *a)
 		ft_sleep(philos->env->time_e);
 		pthread_mutex_unlock(&philos->env->forks[philos->l_fork]);
 		pthread_mutex_unlock(&philos->env->forks[philos->r_fork]);
-		print_philo("is sleeping", philos);
+		print_philo("is sleeping", philos, 0);
 		ft_sleep(philos->env->time_s);
-		print_philo("is thinking", philos);
+		print_philo("is thinking", philos, 0);
 	}
 	return (NULL);
 }
@@ -47,8 +47,9 @@ int	init_pthread(t_env *env)
 	i = -1;
 	env->start_time = get_time();
 	while (++i < env->num_philo)
-		pthread_create(&env->philos[i].thread_id, NULL, routine,
-			&(env->philos[i]));
+		if (pthread_create(&env->philos[i].thread_id, NULL, routine,
+				&(env->philos[i])))
+			return (0);
 	while (1)
 	{
 		i = -1;
@@ -57,9 +58,9 @@ int	init_pthread(t_env *env)
 			pthread_mutex_lock(&env->count);
 			if (env->num_eat != -404 && check_philos(env))
 				return (0);
-			if (get_time() - env->philos[i].last_eat > env->time_d)
+			if ((int)(get_time() - env->philos[i].last_eat) > env->time_d)
 			{
-				print_philo("\033[0;31m died \033[;m", env->philos);
+				print_philo("\033[0;31m died \033[;m", env->philos, 1);
 				return (0);
 			}
 			pthread_mutex_unlock(&env->count);
@@ -75,23 +76,15 @@ int	init_mutex(t_env *env)
 	env->forks = malloc(sizeof(pthread_mutex_t) * env->num_philo);
 	if (!env->forks)
 		return (0);
-	env->writing = malloc(sizeof(pthread_mutex_t) * env->num_philo);
-	if (!env->writing)
-		return (0);
-	env->died = malloc(sizeof(pthread_mutex_t) * env->num_philo);
-	if (!env->died)
-		return (0);
 	i = -1;
 	while (++i < env->num_philo)
 	{
 		if (pthread_mutex_init(&env->forks[i], NULL))
 			return (0);
-		if (pthread_mutex_init(&env->writing[i], NULL))
-			return (0);
-		if (pthread_mutex_init(&env->died[i], NULL))
-			return (0);
 	}
 	if (pthread_mutex_init(&env->count, NULL))
+		return (0);
+	if (pthread_mutex_init(&env->writing, NULL))
 		return (0);
 	return (1);
 }

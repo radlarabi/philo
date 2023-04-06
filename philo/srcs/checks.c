@@ -6,7 +6,7 @@
 /*   By: rlarabi <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/04 22:13:09 by rlarabi           #+#    #+#             */
-/*   Updated: 2023/03/19 23:53:10 by rlarabi          ###   ########.fr       */
+/*   Updated: 2023/04/06 13:29:12 by rlarabi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,11 @@ int	str_is_digit(char *str)
 		return (0);
 	while (str[i])
 	{
+		if (str[0] == '+')
+		{
+			i++;
+			continue ;
+		}
 		if (str[i] < '0' || str[i] > '9')
 			return (0);
 		i++;
@@ -68,10 +73,11 @@ int	check_philos(t_env *env)
 	return (1);
 }
 
-void	print_philo(char *str, t_philos *philos)
+void	print_philo(char *str, t_philos *philos, int a)
 {
-	pthread_mutex_lock(&philos->env->writing[philos->pos - 1]);
+	pthread_mutex_lock(&philos->env->writing);
 	printf("%lu %d %s\n", get_time() - philos->env->start_time, philos->pos,
 		str);
-	pthread_mutex_unlock(&philos->env->writing[philos->pos - 1]);
+	if (!a)
+		pthread_mutex_unlock(&philos->env->writing);
 }

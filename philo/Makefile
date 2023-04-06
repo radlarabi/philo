@@ -4,9 +4,7 @@ SRCS = 	srcs/main.c \
 		srcs/philo_utiles.c \
 		srcs/ft_atoi.c \
 
-# CFLAGS = -Wall -Wextra -Werror
-# CFLAGS  = -fsanitize=thread -g3
-# CFLAGS = -pthread
+CFLAGS = -Wall -Wextra -Werror -fsanitize=thread -g3
 
 NAME = philo
 O_SRCS = $(SRCS:%.c=%.o)
@@ -31,7 +29,3 @@ norm:
 	@norminette							
 
 .PHONY: all clean fclean re norm
-
-
-
-# $(CC) $(CFLAGS) $(SRCS) -o $(NAME) -fsanitize=thread -g3
